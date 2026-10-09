@@ -1,0 +1,125 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Node representing one engine stroke
+struct Stroke {
+    string name;
+    double pressure;
+    double volume;
+    double compressionRatio;
+    Stroke* next;
+};
+
+// Create a new stroke node
+Stroke* createStroke(string name, double pressure,
+                     double volume, double compressionRatio) {
+    Stroke* newNode = new Stroke;
+
+    newNode->name = name;
+    newNode->pressure = pressure;
+    newNode->volume = volume;
+    newNode->compressionRatio = compressionRatio;
+    newNode->next = nullptr;
+
+    return newNode;
+}
+
+// Display current engine stroke
+void displayStroke(Stroke* current) {
+    cout << "\n-----------------------------\n";
+    cout << "Stroke: " << current->name << endl;
+    cout << "Pressure: " << current->pressure << " kPa" << endl;
+    cout << "Volume: " << current->volume << " L" << endl;
+    cout << "Compression Ratio: "
+         << current->compressionRatio << ":1" << endl;
+    cout << "-----------------------------\n";
+}
+
+// Update thermodynamic values
+void updateState(Stroke* current) {
+    if (current->name == "Intake") {
+        current->pressure = 100;
+        current->volume = 2.0;
+    }
+    else if (current->name == "Compression") {
+        current->pressure = 800;
+        current->volume = 0.5;
+    }
+    else if (current->name == "Power") {
+        current->pressure = 3000;
+        current->volume = 2.0;
+    }
+    else if (current->name == "Exhaust") {
+        current->pressure = 120;
+        current->volume = 2.0;
+    }
+}
+
+int main() {
+
+    // Creating four strokes
+    Stroke* intake =
+        createStroke("Intake", 100, 2.0, 10.0);
+
+    Stroke* compression =
+        createStroke("Compression", 800, 0.5, 10.0);
+
+    Stroke* power =
+        createStroke("Power", 3000, 2.0, 10.0);
+
+    Stroke* exhaust =
+        createStroke("Exhaust", 120, 2.0, 10.0);
+
+    // Creating circular linked list
+    intake->next = compression;
+    compression->next = power;
+    power->next = exhaust;
+    exhaust->next = intake;   // Last node points to first
+
+    Stroke* current = intake;
+
+    char command;
+
+    cout << "===== 4-STROKE ENGINE SIMULATOR =====\n";
+    cout << "Press 'n' for next stroke.\n";
+    cout << "Press 'q' to turn engine OFF.\n";
+
+    while (true) {
+
+        displayStroke(current);
+
+        cout << "Enter command (n = next, q = off): ";
+        cin >> command;
+
+        if (command == 'q' || command == 'Q') {
+            cout << "\nEngine OFF.\n";
+            break;
+        }
+
+        if (command == 'n' || command == 'N') {
+
+            // Update current thermodynamic state
+            updateState(current);
+
+            // Move to next stroke
+            current = current->next;
+
+            // If cycle returns to Intake
+            if (current == intake) {
+                cout << "\n*** One complete engine cycle finished ***\n";
+            }
+        }
+        else {
+            cout << "Invalid command!\n";
+        }
+    }
+
+    // Free allocated memory
+    delete intake;
+    delete compression;
+    delete power;
+    delete exhaust;
+
+    return 0;
+}
