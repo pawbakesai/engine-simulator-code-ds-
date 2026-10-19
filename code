@@ -1,267 +1,99 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
-struct Node
-{
-    int customerID;
-    Node* next;
+struct Stroke {
+    string name;
+    double pressure;
+    double volume;
+    double compressionRatio;
+    Stroke* next;
 };
 
-Node* front = NULL;
-Node* rear = NULL;
-
-// Add customer to queue
-void enqueue(int id)
-{
-    Node* newNode = new Node;
-
-    newNode->customerID = id;
-    newNode->next = NULL;
-
-    if (rear == NULL)
-    {
-        front = rear = newNode;
-    }
-    else
-    {
-        rear->next = newNode;
-        rear = newNode;
-    }
-
-    cout << "Customer added successfully.\n";
+Stroke* createStroke(string name, double pressure,
+                     double volume, double ratio) {
+    Stroke* node = new Stroke;
+    node->name = name;
+    node->pressure = pressure;
+    node->volume = volume;
+    node->compressionRatio = ratio;
+    node->next = NULL;
+    return node;
 }
 
-// Serve customer
-void dequeue()
-{
-    if (front == NULL)
-    {
-        cout << "Queue is empty.\n";
-        return;
-    }
-
-    Node* temp = front;
-
-    cout << "Customer " << front->customerID
-         << " is served.\n";
-
-    front = front->next;
-
-    if (front == NULL)
-    {
-        rear = NULL;
-    }
-
-    delete temp;
+void displayStroke(Stroke* current) {
+    cout << "\nStroke: " << current->name << endl;
+    cout << "Pressure: " << current->pressure << endl;
+    cout << "Volume: " << current->volume << endl;
+    cout << "Compression Ratio: "
+         << current->compressionRatio << endl;
 }
 
-// Display customer queue
-void display()
-{
-    if (front == NULL)
-    {
-        cout << "Queue is empty.\n";
-        return;
+void updateState(Stroke* current) {
+    // Example values are used for data-structure demonstration.
+    if (current->name == "Intake") {
+        current->pressure = 1.0;
+        current->volume = 500.0;
+    } else if (current->name == "Compression") {
+        current->pressure = 8.0;
+        current->volume = 80.0;
+    } else if (current->name == "Power") {
+        current->pressure = 35.0;
+        current->volume = 450.0;
+    } else if (current->name == "Exhaust") {
+        current->pressure = 1.2;
+        current->volume = 500.0;
     }
-
-    Node* temp = front;
-
-    cout << "Customer Queue: ";
-
-    while (temp != NULL)
-    {
-        cout << temp->customerID << " -> ";
-        temp = temp->next;
-    }
-
-    cout << "NULL\n";
 }
 
-// Main function
-int main()
-{
-    int choice, id;
+void deleteCycle(Stroke* head) {
+    if (head == NULL) return;
 
-    do
-    {
-        cout << "\n--- Supermarket Customer Queue ---\n";
-        cout << "1. Add Customer\n";
-        cout << "2. Serve Customer\n";
-        cout << "3. Display Queue\n";
-        cout << "4. Exit\n";
-        cout << "Enter choice: ";
+    Stroke* current = head->next;
+    while (current != head) {
+        Stroke* nextNode = current->next;
+        delete current;
+        current = nextNode;
+    }
+    delete head;
+}
 
+int main() {
+    Stroke* intake = createStroke("Intake", 1.0, 500.0, 8.0);
+    Stroke* compression = createStroke("Compression", 8.0, 80.0, 8.0);
+    Stroke* power = createStroke("Power", 35.0, 450.0, 8.0);
+    Stroke* exhaust = createStroke("Exhaust", 1.2, 500.0, 8.0);
+
+    intake->next = compression;
+    compression->next = power;
+    power->next = exhaust;
+    exhaust->next = intake; // Last node points back to head.
+
+    Stroke* current = intake;
+    char choice = 'y';
+
+    cout << "4-Stroke Engine Combustion Cycle Simulator\n";
+
+    while (choice == 'y' || choice == 'Y') {
+        updateState(current);
+        displayStroke(current);
+        current = current->next;
+
+        cout << "\nContinue to next stroke? (y/n): ";
         cin >> choice;
-
-        switch (choice)
-        {
-            case 1:
-                cout << "Enter Customer ID: ";
-                cin >> id;
-                enqueue(id);
-                break;
-
-            case 2:
-                dequeue();
-                break;
-
-            case 3:
-                display();
-                break;
-
-            case 4:
-                cout << "Program ended.\n";
-                break;
-
-            default:
-                cout << "Invalid choice.\n";
-        }
-
-    } while (choice != 4);
-
-    // Free any remaining nodes
-    while (front != NULL)
-    {
-        Node* temp = front;
-        front = front->next;
-        delete temp;
     }
 
-    rear = NULL;
-
+    deleteCycle(intake);
+    cout << "\nEngine simulation stopped. Memory released.\n";
     return 0;
 }
 
-#include <iostream>
-using namespace std;
+            
+   
 
-struct Node
-{
-    int customerID;
-    Node* next;
-};
 
-Node* front = NULL;
-Node* rear = NULL;
 
-// Add customer to queue
-void enqueue(int id)
-{
-    Node* newNode = new Node;
+   
+        
 
-    newNode->customerID = id;
-    newNode->next = NULL;
-
-    if (rear == NULL)
-    {
-        front = rear = newNode;
-    }
-    else
-    {
-        rear->next = newNode;
-        rear = newNode;
-    }
-
-    cout << "Customer added successfully.\n";
-}
-
-// Serve customer
-void dequeue()
-{
-    if (front == NULL)
-    {
-        cout << "Queue is empty.\n";
-        return;
-    }
-
-    Node* temp = front;
-
-    cout << "Customer " << front->customerID
-         << " is served.\n";
-
-    front = front->next;
-
-    if (front == NULL)
-    {
-        rear = NULL;
-    }
-
-    delete temp;
-}
-
-// Display customer queue
-void display()
-{
-    if (front == NULL)
-    {
-        cout << "Queue is empty.\n";
-        return;
-    }
-
-    Node* temp = front;
-
-    cout << "Customer Queue: ";
-
-    while (temp != NULL)
-    {
-        cout << temp->customerID << " -> ";
-        temp = temp->next;
-    }
-
-    cout << "NULL\n";
-}
-
-// Main function
-int main()
-{
-    int choice, id;
-
-    do
-    {
-        cout << "\n--- Supermarket Customer Queue ---\n";
-        cout << "1. Add Customer\n";
-        cout << "2. Serve Customer\n";
-        cout << "3. Display Queue\n";
-        cout << "4. Exit\n";
-        cout << "Enter choice: ";
-
-        cin >> choice;
-
-        switch (choice)
-        {
-            case 1:
-                cout << "Enter Customer ID: ";
-                cin >> id;
-                enqueue(id);
-                break;
-
-            case 2:
-                dequeue();
-                break;
-
-            case 3:
-                display();
-                break;
-
-            case 4:
-                cout << "Program ended.\n";
-                break;
-
-            default:
-                cout << "Invalid choice.\n";
-        }
-
-    } while (choice != 4);
-
-    // Free any remaining nodes
-    while (front != NULL)
-    {
-        Node* temp = front;
-        front = front->next;
-        delete temp;
-    }
-
-    rear = NULL;
-
-    return 0;
-}
+    
